@@ -361,3 +361,399 @@ The research should connect directly to subsequent design and implementation wor
 | Helpers consider time and task difficulty | Understand the commitment before accepting | Requests should describe task details and expected effort | Task details and acceptance flow |
 
 Each proposed feature should be converted into a user story and a development task only when it is included in the agreed MVP scope.
+
+
+## 7. Campus Task Taxonomy & Representative Scenarios
+
+Building on Findings 1 and 6 regarding the nature of campus assistance, student tasks at Ho Chi Minh City University of Technology (HCMUT) exhibit high contextual specificity. To support intuitive categorization and fast matching in the MVP, tasks are organized into five primary functional domains:
+
+| Category | Example Scenarios at HCMUT | Typical Commitment | Urgency Level |
+|---|---|---|---|
+| **Academic Hardware & Study Tools** | Borrowing a display adapter (USB-C/HDMI) before a presentation in Building B4 or H6; borrowing a scientific calculator (Casio fx-580VN); breadboard/jumper wires during lab sessions. | 5–15 minutes | High |
+| **Physical Logistics & Campus Errand** | Assistance carrying heavy project models or laboratory apparatus between Building A4 and C6; borrowing an umbrella during sudden afternoon rain at Di An campus. | 10–20 minutes | Medium |
+| **Wayfinding & Room Orientation** | Locating obscure laboratory sub-rooms (e.g., specialized rooms in Building H6 at Campus 2 or older annexes at Campus 1); finding specific faculty offices for document submission. | 5–10 minutes | Medium |
+| **Emergency & Roadside Incidents** | Flat motorbike tire or drained battery at Student Parking Lot B6 (District 10) or Di An Dormitory parking; locating misplaced student ID cards or keys. | 10–25 minutes | High |
+| **Temporary Item Guarding** | Watching a study desk or personal backpack at the Central Library during a short 10-minute administrative errand or restroom break. | 5–15 minutes | Low |
+
+---
+
+## 8. Target User Personas
+
+To translate the survey findings into user-centric product requirements, two representative personas were developed based on the respondent profile and behavioral patterns.
+
+### Persona 1: The Time-Constrained Requester
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ Nguyen Van Minh — 2nd-Year Computer Science Student                   │
+│ Primary Campus: Campus 2 (Di An, Binh Duong)                          │
+├────────────────────────────────────────────────────────────────────────┤
+│ • Context: Has a seminar presentation in 20 minutes at Building H6.    │
+│   Realizes he forgot his USB-C display adapter at the dorm.            │
+│ • Friction & Frustrations:                                             │
+│   - His closest classmates are currently attending lectures elsewhere. │
+│   - Hesitant to post on large Facebook groups due to spam and judgment.│
+│   - Waiting for message replies in general group chats takes too long. │
+│ • Need: A lightweight way to request a 30-minute adapter loan from any │
+│   verified student currently in Building H6 or nearby.                 │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Persona 2: The Flexible Campus Helper
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│ Tran Thi Lan — 4th-Year Chemical Engineering Student                   │
+│ Primary Campus: Campus 1 (Ly Thuong Kiet, District 10)                 │
+├────────────────────────────────────────────────────────────────────────┤
+│ • Context: Spending a 45-minute break between lab shifts at the ground │
+│   floor study area of Building B2.                                     │
+│ • Motivations & Constraints:                                           │
+│   - Happy to help fellow students if the task is within walking range. │
+│   - Does not want to commit more than 15 minutes of her break.         │
+│   - Requires verified student status to ensure safety before meeting.  │
+│ • Need: An organized feed of small nearby requests that she can accept │
+│   without disclosing her phone number or personal social media.        │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 9. User Journey Mapping (As-Is vs. To-Be)
+
+The following diagram highlights the contrast between the current friction-heavy help-seeking journey and the proposed FlashHelper experience:
+
+```mermaid
+flowchart TD
+    subgraph AsIs ["Current Informal Journey (High Latency & Friction)"]
+        A1["Need arises on campus"] --> A2["Direct message 2-3 personal contacts"]
+        A2 -->|Contacts unavailable| A3["Wait 15-30 mins without resolution"]
+        A3 --> A4["Consider posting to large Facebook/Zalo group"]
+        A4 -->|Fear of public exposure / spamming| A5["Abandon request & resolve alone (90%)"]
+    end
+
+    subgraph ToBe ["FlashHelper Experience (Target Workflow)"]
+        B1["Need arises on campus"] --> B2["Create structured request (30 seconds)"]
+        B2 --> B3["Broadcast to verified students in same building/zone"]
+        B3 --> B4["Helper accepts within 5-8 mins"]
+        B4 --> B5["In-app coordination & meet at public location"]
+        B5 --> B6["Task completed & mutual feedback submitted"]
+    end
+```
+
+---
+
+## 10. Safety, Trust & Academic Integrity Policy
+
+Building on Finding 4 regarding trust and identity, FlashHelper incorporates explicit safety rules and ethical safeguards to ensure platform compliance with university standards:
+
+### 10.1. Academic Integrity Standard
+FlashHelper is strictly intended for practical, everyday campus assistance. The following activities are classified as severe violations:
+- **Proxy Attendance:** Requesting or offering to answer roll-call or scan attendance for another student.
+- **Assessment Fraud:** Requesting or providing assistance during exams, quizzes, or submitting academic assignments on behalf of others.
+- **Unauthorized Material Distribution:** Sharing confidential exam questions or restricted academic documents.
+
+*Enforcement:* Automated title and description screening blocks keywords associated with academic dishonesty (`điểm danh hộ`, `thi hộ`, `làm bài tập hộ`). Accounts violating these rules are subject to immediate suspension.
+
+### 10.2. In-Person Safety Guidelines
+- **Public Meeting Points:** All handoffs and interactions must occur in designated public campus spaces (e.g., faculty ground-floor lobbies, campus cafeterias, university libraries).
+- **Pseudonymity with Verified Identity:** Requesters and helpers interact using verified student aliases. Real names and student email addresses are held securely in the backend and disclosed to authorities only upon verified reports of misconduct.
+- **One-Tap Reporting:** Users can flag inappropriate behavior, harassment, or no-shows directly from the task screen.
+
+---
+
+## 11. Quantitative Target Metrics & Pilot Scorecard
+
+Extending the validation plan outlined in Section 5, the following quantitative benchmarks will be used to evaluate the pilot release:
+
+| Objective | Target Metric | Target Benchmark | Measurement Method |
+|---|---|---|---|
+| **Discovery Efficiency** | Median Time to First Offer (MTTO) | $\le 8$ minutes | Server timestamp delta between task publish and first claim |
+| **Matching Success** | Task Completion Rate | $\ge 70\%$ of open tasks | Percentage of tasks marked completed by both participants |
+| **Identity Verification** | Verification Funnel Conversion | $\ge 95\%$ | Successful OTP completions divided by verification attempts |
+| **System Reliability** | Task Abandonment Rate | $\le 15\%$ | Percentage of matched tasks cancelled by either party |
+| **User Satisfaction** | Post-Task CSAT Rating | $\ge 4.2 / 5.0$ | In-app 1-to-5 star evaluation submitted upon completion |
+| **Safety Standard** | Zero-Tolerance Safety Incidents | 0 critical safety flags | Moderator audit log throughout pilot duration |
+
+---
+
+## 12. Appendix: Survey Instrument
+
+The empirical data in Section 2 was gathered using the following questionnaire items:
+
+1. **Demographics:** Academic year and home institution (HCMUT vs. other VNU-HCM schools).
+2. **Frequency of Need:** How often do you face situations on campus where you need unexpected assistance? *(Rarely / Occasionally / Frequently)*
+3. **Resolution Time:** How long does it usually take you to find someone to help? *(<15 mins / 15-60 mins / Several hours / Unable to find)*
+4. **First Point of Contact:** Whom do you reach out to first when an issue arises? *(Close friends / Classmates / Nearby strangers / Public groups)*
+5. **Channels Used:** Which channels do you currently use to seek assistance? *(Direct DMs / In-person / Facebook groups / Large group chats)*
+6. **Inhibition Factors:** What discourages you from asking for help publicly? *(Fear of judgment / Privacy / Low response confidence / Disturbance)*
+7. **Willingness to Help:** Under what conditions are you open to helping a fellow student? *(Always / Depends on task & time / Only acquaintances)*
+8. **Alternative Fallback:** What do you do when no one is available to help? *(Handle alone / Give up / Wait)*
+9. **Priority Capabilities:** What is the single most important capability for a dedicated platform? *(Verification / Location / Reputation / Alerts)*
+10. **Identity Display Preference:** How should your identity appear to others? *(Anonymous + verified badge / Nickname / Real name)*
+
+---
+
+# Technical Architecture & System Implementation
+
+## 13. System Architecture & Component Diagram
+
+FlashHelper follows a clean client-server architecture designed for low-latency communication and modular service scaling:
+
+```mermaid
+graph TD
+    subgraph ClientLayer ["Client Layer"]
+        C1["Flutter iOS Client"]
+        C2["Flutter Android Client"]
+    end
+
+    subgraph Gateway ["Gateway & Reverse Proxy"]
+        GW["API Gateway & Reverse Proxy (Nginx)"]
+    end
+
+    subgraph CoreServices ["Application Services (NestJS)"]
+        S1["Authentication & Identity Service"]
+        S2["Task Management Service"]
+        S3["Real-Time Dispatch & Matching Engine"]
+        S4["In-App Messaging Service"]
+        S5["Reputation & Moderation Service"]
+    end
+
+    subgraph DataStore ["Persistence & Cache"]
+        DB[("PostgreSQL 16 (Relational DB)")]
+        RD[("Redis 7 (Pub/Sub & Locks)")]
+        FS[("S3 Compatible Object Storage")]
+    end
+
+    subgraph ExternalServices ["External Integrations"]
+        EXT1["HCMUT Mail / SMTP Server"]
+        EXT2["Firebase Cloud Messaging (FCM)"]
+    end
+
+    C1 & C2 -->|HTTPS REST & WSS| GW
+    GW --> S1 & S2 & S3 & S4 & S5
+    S1 --> EXT1
+    S3 --> EXT2
+    S1 & S2 & S4 & S5 --> DB
+    S3 & S4 --> RD
+    S2 --> FS
+```
+
+---
+
+## 14. Technology Stack & Evaluation
+
+| Component | Selected Technology | Rationale & Trade-offs |
+|---|---|---|
+| **Mobile Client** | **Flutter (Dart 3)** | Delivers high-performance native rendering on both iOS and Android from a single shared codebase, minimizing duplicate maintenance overhead. |
+| **Backend Core** | **NestJS (TypeScript)** | Provides enterprise-grade modular architecture, native dependency injection, integrated WebSocket gateway support, and shared TypeScript DTOs. |
+| **Primary Database** | **PostgreSQL 16** | Robust relational data consistency (ACID), strong foreign key integrity for audit trails, and native support for spatial querying if campus zones expand. |
+| **In-Memory Cache & Pub/Sub**| **Redis 7** | Sub-millisecond latency for real-time task claim locking (preventing double-claims) and WebSocket message brokering across backend instances. |
+| **Push Notifications** | **Firebase Cloud Messaging** | Ensures timely wake-up alerts when users receive task applications while the application is backgrounded. |
+
+---
+
+## 15. Core Workflows & State Machines
+
+### 15.1. Student Email Verification Workflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Student
+    participant App as Mobile App
+    participant API as Auth Service
+    participant Mail as HCMUT Mail Server
+
+    Student->>App: Enter student email (@hcmut.edu.vn)
+    App->>API: POST /api/v1/auth/request-otp
+    API->>API: Generate 6-digit cryptographic OTP (expiry: 5 mins)
+    API->>Mail: Dispatch verification email
+    Mail-->>Student: Deliver OTP code
+    Student->>App: Enter received 6-digit OTP
+    App->>API: POST /api/v1/auth/verify-otp
+    API->>API: Validate code & sign JWT Access + Refresh Tokens
+    API-->>App: Return JWT tokens & Verified Profile
+    App-->>Student: Present Home Task Feed
+```
+
+### 15.2. Task Lifecycle State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> DRAFT
+    DRAFT --> OPEN : Requester publishes task
+    OPEN --> CLAIMED : Helper applies & Requester accepts
+    OPEN --> EXPIRED : 30 minutes elapsed without helper
+    OPEN --> CANCELLED : Requester cancels request
+    CLAIMED --> IN_PROGRESS : Helper arrives at designated zone
+    CLAIMED --> OPEN : Helper withdraws / Requester unassigns
+    IN_PROGRESS --> COMPLETED : Both parties confirm resolution
+    IN_PROGRESS --> DISPUTED : Either party submits report
+    COMPLETED --> [*]
+    EXPIRED --> [*]
+    CANCELLED --> [*]
+    DISPUTED --> [*]
+```
+
+### 15.3. Campus Zone Discretization
+
+To honor user privacy (Finding 5), the platform does not continuously poll device GPS coordinates. Instead, tasks are bound to predefined discrete zones:
+- **Campus 1 (Ly Thuong Kiet):** `ZONE_CS1_A`, `ZONE_CS1_B`, `ZONE_CS1_C`, `ZONE_CS1_LIB`.
+- **Campus 2 (Di An):** `ZONE_CS2_H1_H2`, `ZONE_CS2_H3`, `ZONE_CS2_H6`, `ZONE_CS2_CENTRAL_LIB`, `ZONE_CS2_KTX`.
+
+Specific room numbers (e.g., "Room 402, Building H6") are revealed exclusively inside the temporary in-app chat after a helper's offer is accepted.
+
+---
+
+## 16. Data Architecture & Database Schema
+
+```mermaid
+erDiagram
+    USERS ||--o{ TASKS : "creates"
+    USERS ||--o{ TASK_APPLICATIONS : "submits"
+    USERS ||--o{ REVIEWS : "reviews/reviewed"
+    TASKS ||--o{ TASK_APPLICATIONS : "receives"
+    TASKS ||--o| MATCHES : "transitions to"
+    MATCHES ||--o{ CHAT_MESSAGES : "contains"
+    MATCHES ||--o{ REVIEWS : "evaluates"
+
+    USERS {
+        uuid id PK
+        string email UK
+        string student_id_hash UK
+        string nickname
+        boolean is_verified
+        decimal reputation_rating
+        timestamp created_at
+    }
+
+    TASKS {
+        uuid id PK
+        uuid requester_id FK
+        string category
+        string title
+        text description
+        string campus_code
+        string zone_code
+        integer estimated_minutes
+        string status
+        timestamp expires_at
+        timestamp created_at
+    }
+
+    TASK_APPLICATIONS {
+        uuid id PK
+        uuid task_id FK
+        uuid helper_id FK
+        string status
+        timestamp created_at
+    }
+
+    MATCHES {
+        uuid id PK
+        uuid task_id FK
+        uuid helper_id FK
+        timestamp matched_at
+        timestamp completed_at
+        string final_status
+    }
+
+    REVIEWS {
+        uuid id PK
+        uuid match_id FK
+        uuid reviewer_id FK
+        uuid reviewee_id FK
+        integer rating_score
+        string feedback_text
+        timestamp created_at
+    }
+```
+
+---
+
+## 17. API & Real-Time WebSocket Specifications
+
+### 17.1. RESTful Endpoints Overview
+
+| Service Scope | HTTP Method | Route | Description | Auth Required |
+|---|---|---|---|:---:|
+| **Authentication** | `POST` | `/api/v1/auth/request-otp` | Issues OTP to institutional email | No |
+| | `POST` | `/api/v1/auth/verify-otp` | Validates OTP and exchanges for JWTs | No |
+| | `POST` | `/api/v1/auth/refresh` | Refreshes expired access tokens | No |
+| **Task Management** | `GET` | `/api/v1/tasks` | Lists active `OPEN` tasks with filters | Yes |
+| | `POST` | `/api/v1/tasks` | Creates a new help request | Yes |
+| | `GET` | `/api/v1/tasks/:id` | Returns full details of a specific task | Yes |
+| | `PATCH` | `/api/v1/tasks/:id/cancel`| Cancels an open request | Yes |
+| **Coordination** | `POST` | `/api/v1/tasks/:id/apply` | Helper applies to assist | Yes |
+| | `POST` | `/api/v1/tasks/:id/accept` | Requester accepts helper application | Yes |
+| | `POST` | `/api/v1/tasks/:id/complete`| Confirms task completion | Yes |
+| **Trust & Safety** | `POST` | `/api/v1/reviews` | Submits post-task rating and feedback | Yes |
+| | `POST` | `/api/v1/reports` | Reports a violation or safety issue | Yes |
+
+### 17.2. WebSocket Gateway Events (`/ws/v1`)
+- `task:new`: Emitted to subscribers of a campus zone when a new request opens.
+- `application:created`: Notifies the requester that a helper is available.
+- `match:confirmed`: Notifies the helper that their assistance was accepted.
+- `chat:message`: Real-time bidirectional coordination messaging.
+- `task:completed`: Signals both clients to render the feedback and rating modal.
+
+---
+
+## 18. Developer Guide & Local Environment Setup
+
+### 18.1. Prerequisites
+- Docker Engine $\ge 24.0$ & Docker Compose $\ge 2.20$
+- Node.js LTS $\ge 20.x$
+- Flutter SDK $\ge 3.22.x$
+
+### 18.2. Starting Infrastructure
+```bash
+# Clone the repository and navigate to root
+git clone https://github.com/your-org/FlashHelper.git
+cd FlashHelper
+
+# Start PostgreSQL and Redis containers
+docker compose up -d postgres redis mailpit
+```
+
+> [!TIP]
+> **Mailpit Local Email Testing:**
+> When running locally, OTP verification emails are captured by Mailpit. View sent verification emails by navigating to `http://localhost:8025` in your browser.
+
+### 18.3. Running Backend Services
+```bash
+cd backend
+npm install
+npx prisma migrate dev
+npm run start:dev
+```
+
+### 18.4. Running Mobile Application
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+
+---
+
+## 19. Project Roadmap & Delivery Milestones
+
+```mermaid
+gantt
+    title FlashHelper Development & Validation Schedule (2026-2027)
+    dateFormat  YYYY-MM-DD
+    section Phase 1: Research & Discovery
+    User Survey & Desk Research       :done,    m1, 2026-10-08, 2026-10-18
+    Architecture & Scope Formulation  :done,    m2, 2026-10-19, 2026-10-25
+    section Phase 2: Core MVP Build
+    Student Email OTP & Auth Module   :active,  m3, 2026-10-26, 2026-11-09
+    Task Posting & Campus Feed        :         m4, 2026-11-10, 2026-11-24
+    Real-Time Coordination & Chat     :         m5, 2026-11-25, 2026-12-09
+    section Phase 3: Testing & Pilot
+    Laboratory Usability Testing      :         m6, 2026-12-10, 2026-12-20
+    Campus 2 (Di An) Closed Pilot     :         m7, 2026-12-21, 2027-01-12
+    section Phase 4: Release
+    Campus-wide General Availability  :         m8, 2027-01-15, 2027-02-01
+```
