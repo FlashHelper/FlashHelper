@@ -3,16 +3,18 @@ package config
 import (
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	AppPort      string
-	AuthUsername string
-	AuthPassword string
-	SessionTTL   time.Duration
+	AppPort    string
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+	JWTSecret  string
 }
 
 func LoadConfig() *Config {
@@ -20,17 +22,14 @@ func LoadConfig() *Config {
 		log.Println("No .env file found, using environment variables")
 	}
 
-	sessionTTL, err := time.ParseDuration(getEnv("SESSION_TTL", "24h"))
-	if err != nil || sessionTTL <= 0 {
-		log.Println("Invalid SESSION_TTL, using default 24h")
-		sessionTTL = 24 * time.Hour
-	}
-
 	return &Config{
-		AppPort:      getEnv("APP_PORT", "8080"),
-		AuthUsername: getEnv("AUTH_USERNAME", "admin"),
-		AuthPassword: getEnv("AUTH_PASSWORD", "flashhelper-dev-password"),
-		SessionTTL:   sessionTTL,
+		AppPort:    getEnv("APP_PORT", "8080"),
+		DBHost:     getEnv("DB_HOST", "localhost"),
+		DBPort:     getEnv("DB_PORT", "5432"),
+		DBUser:     getEnv("DB_USER", "flashhelper"),
+		DBPassword: getEnv("DB_PASSWORD", "flashhelper-dev-password"),
+		DBName:     getEnv("DB_NAME", "flashhelper"),
+		JWTSecret:  getEnv("JWT_SECRET_KEY", "flashhelper-local-development-secret-change-before-deploying"),
 	}
 }
 

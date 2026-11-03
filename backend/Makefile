@@ -13,11 +13,11 @@ build:
 	@go build -o ./bin/server.exe ./cmd/server
 
 up:
-	@echo "==> Building and starting API..."
+	@echo "==> Building and starting API, PostgreSQL..."
 	@docker compose up -d --build
 
 down:
-	@echo "==> Stopping services..."
+	@echo "==> Stopping services and preserving database volumes..."
 	@docker compose down
 
 run:

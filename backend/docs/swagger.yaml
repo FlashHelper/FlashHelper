@@ -1,68 +1,30 @@
 basePath: /api
 definitions:
-  dto.ErrorResponse:
-    properties:
-      error:
-        example: unauthorized
-        type: string
-        x-order: "2"
-      success:
-        example: false
-        type: boolean
-        x-order: "1"
-    type: object
-  dto.LoginRequest:
+  dto.CreateUserRequest:
     properties:
       password:
-        example: flashhelper-dev-password
         maxLength: 72
+        minLength: 8
         type: string
-        x-order: "2"
       username:
-        example: admin
         maxLength: 100
         type: string
-        x-order: "1"
     required:
     - password
     - username
     type: object
-  dto.LoginResponse:
+  dto.UpdateUserRequest:
     properties:
-      expires_at:
-        example: "2026-11-04T21:09:38+07:00"
+      password:
+        maxLength: 72
+        minLength: 8
         type: string
-        x-order: "2"
-      role:
-        example: ADMIN
-        type: string
-        x-order: "4"
-      session_id:
-        example: HZd-KGRl6mSP3XTLBccL9E4EiGqdwyyngtf7-FVrk0k
-        type: string
-        x-order: "1"
       username:
-        example: admin
+        maxLength: 100
         type: string
-        x-order: "3"
-    type: object
-  dto.LoginSuccessResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/dto.LoginResponse'
-        x-order: "2"
-      success:
-        example: true
-        type: boolean
-        x-order: "1"
-    type: object
-  dto.SuccessResponse:
-    properties:
-      success:
-        example: true
-        type: boolean
-        x-order: "1"
+    required:
+    - password
+    - username
     type: object
 info:
   contact: {}
@@ -71,67 +33,189 @@ info:
   title: FlashHelper API
   version: "1.0"
 paths:
-  /auth/login:
+  /users:
+    get:
+      description: Lấy danh sách người dùng trong hệ thống
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Danh sách người dùng
+      tags:
+      - users
     post:
       consumes:
       - application/json
-      description: Kiểm tra username/password và tạo session. Session ID được trả
-        về trong body và trong cookie session_id
+      description: Thêm người dùng mới với quyền USER mặc định
       parameters:
-      - description: Thông tin đăng nhập
+      - description: Thông tin người dùng
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.LoginRequest'
+          $ref: '#/definitions/dto.CreateUserRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
-            $ref: '#/definitions/dto.LoginSuccessResponse'
+            additionalProperties: true
+            type: object
         "400":
-          description: invalid request
+          description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-        "401":
-          description: invalid username or password
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            additionalProperties: true
+            type: object
         "500":
-          description: internal server error
+          description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
-      summary: Đăng nhập
+            additionalProperties: true
+            type: object
+      summary: Tạo người dùng mới
       tags:
-      - auth
-  /auth/logout:
-    post:
-      description: Hủy session hiện tại
+      - users
+  /users/{id}:
+    delete:
+      description: Xóa người dùng theo ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.SuccessResponse'
-        "401":
-          description: unauthorized
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
         "500":
-          description: internal server error
+          description: Internal Server Error
           schema:
-            $ref: '#/definitions/dto.ErrorResponse'
+            additionalProperties: true
+            type: object
       security:
-      - SessionAuth: []
-      summary: Đăng xuất
+      - BearerAuth: []
+      summary: Xóa người dùng
       tags:
-      - auth
+      - users
+    get:
+      description: Truy xuất thông tin người dùng theo ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Lấy thông tin người dùng theo ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Cập nhật username và mật khẩu; giữ nguyên quyền hiện tại
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Thông tin cập nhật
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Cập nhật người dùng
+      tags:
+      - users
 securityDefinitions:
-  SessionAuth:
-    description: 'Nhập session ID theo định dạng: Bearer <session_id>'
+  BearerAuth:
+    description: 'Nhập JWT theo định dạng: Bearer <token>'
     in: header
     name: Authorization
     type: apiKey
