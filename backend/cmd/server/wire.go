@@ -6,6 +6,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -41,7 +42,11 @@ func ProvideRouter(
 	}))
 
 	// Swagger
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api/docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/api/docs/index.html")
+	})
+
+	r.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
 

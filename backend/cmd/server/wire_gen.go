@@ -17,6 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"net/http"
 )
 
 import (
@@ -60,7 +61,11 @@ func ProvideRouter(
 		AllowCredentials: true,
 	}))
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api/docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/api/docs/index.html")
+	})
+
+	r.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
 	router.SetupUserRoutes(api, userHandler)
