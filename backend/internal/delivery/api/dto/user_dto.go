@@ -1,6 +1,6 @@
 package dto
 
-import "nhana/internal/domain/user"
+import "FlashHelper/internal/domain/user"
 
 type CreateUserRequest struct {
     Username string `json:"username" binding:"required,max=100"`
