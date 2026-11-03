@@ -14,8 +14,10 @@ import (
 
 	"FlashHelper/internal/config"
 	"FlashHelper/internal/delivery/api/handler"
+	"FlashHelper/internal/delivery/api/middleware"
 	"FlashHelper/internal/delivery/api/router"
-	"FlashHelper/internal/infra/postgres"
+	"FlashHelper/internal/infra/memory"
+	"FlashHelper/internal/usecase"
 	"FlashHelper/internal/usecase/implement"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -23,7 +25,8 @@ import (
 )
 
 func ProvideRouter(
-	userHandler *handler.UserHandler,
+	authHandler *handler.AuthHandler,
+	authService usecase.AuthService,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -42,15 +45,15 @@ func ProvideRouter(
 	}))
 
 	// Swagger
-	r.GET("/api/docs", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/api/docs/index.html")
+	r.GET("/api-docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/api-docs/index.html")
 	})
 
-	r.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
 
-	router.SetupUserRoutes(api, userHandler)
+	router.SetupAuthRoutes(api, authHandler, middleware.RequireAuth(authService))
 
 	return r
 }
@@ -60,17 +63,15 @@ func InitializeServer(
 	cfg *config.Config,
 ) (*gin.Engine, func(), error) {
 	wire.Build(
-		// Infrastructure
-		postgres.NewDB,
-
 		// Repository
-		postgres.NewUserRepository,
+		memory.NewUserRepository,
+		memory.NewSessionRepository,
 
 		// UseCase
-		implement.NewUserService,
+		implement.NewAuthService,
 
 		// Handler
-		handler.NewUserHandler,
+		handler.NewAuthHandler,
 
 		// Router
 		ProvideRouter,

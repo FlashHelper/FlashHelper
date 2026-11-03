@@ -17,10 +17,10 @@ import (
 // @description     API documentation cho FlashHelper
 // @termsOfService  http://swagger.io/terms/
 // @BasePath        /api
-// @securityDefinitions.apikey BearerAuth
+// @securityDefinitions.apikey SessionAuth
 // @in header
 // @name Authorization
-// @description Nhập JWT theo định dạng: Bearer <token>
+// @description Nhập session ID theo định dạng: Bearer <session_id>
 func main() {
 	// Logger
 	infra.InitZerolog()

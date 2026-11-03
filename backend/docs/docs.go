@@ -16,40 +16,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Lấy danh sách người dùng trong hệ thống",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Danh sách người dùng",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
+        "/auth/login": {
             "post": {
-                "description": "Thêm người dùng mới với quyền USER mặc định",
+                "description": "Kiểm tra username/password và tạo session. Session ID được trả về trong body và trong cookie session_id",
                 "consumes": [
                     "application/json"
                 ],
@@ -57,230 +26,80 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "auth"
                 ],
-                "summary": "Tạo người dùng mới",
+                "summary": "Đăng nhập",
                 "parameters": [
                     {
-                        "description": "Thông tin người dùng",
+                        "description": "Thông tin đăng nhập",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateUserRequest"
+                            "$ref": "#/definitions/dto.LoginRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.LoginSuccessResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "invalid request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
-                    "409": {
-                        "description": "Conflict",
+                    "401": {
+                        "description": "invalid username or password",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
             }
         },
-        "/users/{id}": {
-            "get": {
+        "/auth/logout": {
+            "post": {
                 "security": [
                     {
-                        "BearerAuth": []
+                        "SessionAuth": []
                     }
                 ],
-                "description": "Truy xuất thông tin người dùng theo ID",
+                "description": "Hủy session hiện tại",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "auth"
                 ],
-                "summary": "Lấy thông tin người dùng theo ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "Đăng xuất",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.SuccessResponse"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "401": {
+                        "description": "unauthorized",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Cập nhật username và mật khẩu; giữ nguyên quyền hiện tại",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Cập nhật người dùng",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Thông tin cập nhật",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpdateUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Xóa người dùng theo ID",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "Xóa người dùng",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/dto.ErrorResponse"
                         }
                     }
                 }
@@ -288,46 +107,99 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CreateUserRequest": {
+        "dto.ErrorResponse": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
-                "password": {
-                    "type": "string",
-                    "maxLength": 72,
-                    "minLength": 8
+                "success": {
+                    "type": "boolean",
+                    "x-order": "1",
+                    "example": false
                 },
-                "username": {
+                "error": {
                     "type": "string",
-                    "maxLength": 100
+                    "x-order": "2",
+                    "example": "unauthorized"
                 }
             }
         },
-        "dto.UpdateUserRequest": {
+        "dto.LoginRequest": {
             "type": "object",
             "required": [
                 "password",
                 "username"
             ],
             "properties": {
+                "username": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "x-order": "1",
+                    "example": "admin"
+                },
                 "password": {
                     "type": "string",
                     "maxLength": 72,
-                    "minLength": 8
+                    "x-order": "2",
+                    "example": "flashhelper-dev-password"
+                }
+            }
+        },
+        "dto.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "session_id": {
+                    "type": "string",
+                    "x-order": "1",
+                    "example": "HZd-KGRl6mSP3XTLBccL9E4EiGqdwyyngtf7-FVrk0k"
+                },
+                "expires_at": {
+                    "type": "string",
+                    "x-order": "2",
+                    "example": "2026-11-04T21:09:38+07:00"
                 },
                 "username": {
                     "type": "string",
-                    "maxLength": 100
+                    "x-order": "3",
+                    "example": "admin"
+                },
+                "role": {
+                    "type": "string",
+                    "x-order": "4",
+                    "example": "ADMIN"
+                }
+            }
+        },
+        "dto.LoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "x-order": "1",
+                    "example": true
+                },
+                "data": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.LoginResponse"
+                        }
+                    ],
+                    "x-order": "2"
+                }
+            }
+        },
+        "dto.SuccessResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean",
+                    "x-order": "1",
+                    "example": true
                 }
             }
         }
     },
     "securityDefinitions": {
-        "BearerAuth": {
-            "description": "Nhập JWT theo định dạng: Bearer \u003ctoken\u003e",
+        "SessionAuth": {
+            "description": "Nhập session ID theo định dạng: Bearer \u003csession_id\u003e",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

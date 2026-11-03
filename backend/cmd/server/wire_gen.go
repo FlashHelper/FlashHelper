@@ -9,8 +9,10 @@ package main
 import (
 	"FlashHelper/internal/config"
 	"FlashHelper/internal/delivery/api/handler"
+	"FlashHelper/internal/delivery/api/middleware"
 	"FlashHelper/internal/delivery/api/router"
-	"FlashHelper/internal/infra/postgres"
+	"FlashHelper/internal/infra/memory"
+	"FlashHelper/internal/usecase"
 	"FlashHelper/internal/usecase/implement"
 	"context"
 	"github.com/gin-contrib/cors"
@@ -27,23 +29,23 @@ import (
 // Injectors from wire.go:
 
 func InitializeServer(ctx context.Context, cfg *config.Config) (*gin.Engine, func(), error) {
-	pool, cleanup, err := postgres.NewDB(ctx, cfg)
+	repository, err := memory.NewUserRepository(cfg)
 	if err != nil {
 		return nil, nil, err
 	}
-	repository := postgres.NewUserRepository(pool)
-	userService := implement.NewUserService(repository)
-	userHandler := handler.NewUserHandler(userService)
-	engine := ProvideRouter(userHandler)
+	sessionRepository := memory.NewSessionRepository()
+	authService := implement.NewAuthService(cfg, repository, sessionRepository)
+	authHandler := handler.NewAuthHandler(authService)
+	engine := ProvideRouter(authHandler, authService)
 	return engine, func() {
-		cleanup()
 	}, nil
 }
 
 // wire.go:
 
 func ProvideRouter(
-	userHandler *handler.UserHandler,
+	authHandler *handler.AuthHandler,
+	authService usecase.AuthService,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -61,14 +63,14 @@ func ProvideRouter(
 		AllowCredentials: true,
 	}))
 
-	r.GET("/api/docs", func(c *gin.Context) {
-		c.Redirect(http.StatusMovedPermanently, "/api/docs/index.html")
+	r.GET("/api-docs", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/api-docs/index.html")
 	})
 
-	r.GET("/api/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
-	router.SetupUserRoutes(api, userHandler)
+	router.SetupAuthRoutes(api, authHandler, middleware.RequireAuth(authService))
 
 	return r
 }
